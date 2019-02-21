@@ -22,67 +22,66 @@ SOFTWARE.
 
 package com.anarsultanov.airportmap;
 
-import java.util.List;
-
 import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.SimpleLinesMarker;
 import de.fhpotsdam.unfolding.utils.MapPosition;
 import processing.core.PGraphics;
 
-/** 
+import java.util.List;
+
+/**
  * A class to represent RouteMarkers on a world map.
- *   
+ *
  * @author Anar Sultanov
- * 
  */
 
-public class RouteMarker extends SimpleLinesMarker{
+public class RouteMarker extends SimpleLinesMarker {
 
-	private static final int LINES = 5;
+    private static final int LINES = 5;
 
-	public RouteMarker(Location start, Location end) {
-		super(start, end);
-	}
+    public RouteMarker(Location start, Location end) {
+        super(start, end);
+    }
 
-	public RouteMarker(List<Location> location) {
-		super(location);
-	}
-	
-	public RouteMarker(List<Location> location, java.util.HashMap<java.lang.String,java.lang.Object> properties) {
-		super(location, properties);
-	}
+    public RouteMarker(List<Location> location) {
+        super(location);
+    }
 
-	
-	public void draw(PGraphics pg, List<MapPosition> mapPositions) {
-		if (!hidden) {
-			drawMarker(pg, mapPositions);
-			if (selected) {
-				showTitle(pg, mapPositions);
-			}
-		}
-	}
-	
-	public void drawMarker(PGraphics pg, List<MapPosition> mapPositions) {
-		pg.pushStyle();
-		pg.strokeWeight(1);
-		pg.stroke(0);
-		pg.beginShape(LINES);
-		for (MapPosition mapPosition : mapPositions) {
-			pg.vertex(mapPosition.x, mapPosition.y);
-		}
-		pg.endShape();
-		pg.popStyle();
-	}
+    public RouteMarker(List<Location> location, java.util.HashMap<java.lang.String, java.lang.Object> properties) {
+        super(location, properties);
+    }
 
-	public void showTitle(PGraphics pg, List<MapPosition> mapPositions) {
-		pg.pushStyle();
-		pg.fill(200);
-		MapPosition positionOne = mapPositions.get(0);
-		MapPosition positionTwo = mapPositions.get(1);
-		float averageX = positionOne.x - positionTwo.x;
-		float averageY = positionOne.y - positionTwo.y;
-		pg.rect(averageX, averageY, 50, 50);
-		pg.popStyle();
-	}
+
+    public void draw(PGraphics pg, List<MapPosition> mapPositions) {
+        if (!hidden) {
+            drawMarker(pg, mapPositions);
+            if (selected) {
+                showTitle(pg, mapPositions);
+            }
+        }
+    }
+
+    public void drawMarker(PGraphics pg, List<MapPosition> mapPositions) {
+        pg.pushStyle();
+        pg.strokeWeight(1);
+        pg.stroke(0);
+        pg.beginShape(LINES);
+        for (MapPosition mapPosition : mapPositions) {
+            pg.vertex(mapPosition.x, mapPosition.y);
+        }
+        pg.endShape();
+        pg.popStyle();
+    }
+
+    public void showTitle(PGraphics pg, List<MapPosition> mapPositions) {
+        pg.pushStyle();
+        pg.fill(200);
+        MapPosition positionOne = mapPositions.get(0);
+        MapPosition positionTwo = mapPositions.get(1);
+        float averageX = positionOne.x - positionTwo.x;
+        float averageY = positionOne.y - positionTwo.y;
+        pg.rect(averageX, averageY, 50, 50);
+        pg.popStyle();
+    }
 
 }
