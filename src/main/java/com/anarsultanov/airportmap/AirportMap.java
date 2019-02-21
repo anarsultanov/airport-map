@@ -35,20 +35,15 @@ import de.fhpotsdam.unfolding.geo.Location;
 import processing.core.PApplet;
 
 
-/** 
- * An applet that shows airports (and routes) on a world map. 
+/**
+ * An applet that shows airports (and routes) on a world map.
  *
  * @author Anar Sultanov
  *
  */
 
 public class AirportMap extends PApplet {
-	
-	private static final long serialVersionUID = 1L;
-	//URLs for airports and routes databases 
-	private String airportsDataURL = "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat";
-	private String routesDataURL = "https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat";
-	
+
 	//Map
 	UnfoldingMap map;
 	//Markers
@@ -60,7 +55,7 @@ public class AirportMap extends PApplet {
 	private Marker lastClicked;
 	//True when click on an empty space
 	private boolean emptySpaceClick;
-	
+
 	public void setup() {
 		// setting up PApplet
 		size(800,600, OPENGL);
@@ -73,60 +68,63 @@ public class AirportMap extends PApplet {
 		//set zoom levels and pan to user's location
 		map.setZoomRange(6, 8);
 		map.zoomAndPanTo(6, userLocation.getLocation());
-		
+
 		// get features from airport data
+		//URLs for airports and routes databases
+		String airportsDataURL = "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat";
 		List<PointFeature> features = DataParser.parseAirports(this, airportsDataURL);
-		
+
 		// list for markers, hashmap for quicker access when matching with routes
 		airportList = new ArrayList<Marker>();
 		HashMap<Integer, Location> airports = new HashMap<Integer, Location>();
-		
+
 		// create markers from features
 		for(PointFeature feature : features) {
 			AirportMarker m = new AirportMarker(feature);
-	
+
 			airportList.add(m);
-			
+
 			// put airport in hashmap with OpenFlights unique id for key
 			airports.put(Integer.parseInt(feature.getId()), feature.getLocation());
-		
+
 		}
-		
-		
+
+
 		// parse route data
+		String routesDataURL = "https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat";
 		List<ShapeFeature> routes = DataParser.parseRoutes(this, routesDataURL);
 		routeList = new ArrayList<Marker>();
 		for(ShapeFeature route : routes) {
-			
+
 			// get source and destination airportIds
 			int source = Integer.parseInt((String)route.getProperty("source"));
 			int dest = Integer.parseInt((String)route.getProperty("destination"));
-			
+
 			// get locations for airports on route
 			if(airports.containsKey(source) && airports.containsKey(dest)) {
 				route.addLocation(airports.get(source));
 				route.addLocation(airports.get(dest));
 			}
-			
+
 			RouteMarker sl = new RouteMarker(route.getLocations(), route.getProperties());
-		
+
 			sl.setHidden(true);
-			
+
 			routeList.add(sl);
 		}
 		// add markers to the map
 		map.addMarkers(routeList);
 		map.addMarkers(airportList);
 		map.addMarker(userMarker);
-		
+
 	}
-	
+
 	public void draw() {
 		background(0);
-		map.draw();		
+		map.draw();
 	}
-	
-	/** Event handler that gets called automatically when the 
+
+	/** Event handler that gets called automatically when the
 	 * mouse moves.
 	 */
 	@Override
@@ -136,14 +134,14 @@ public class AirportMap extends PApplet {
 		if (lastSelected != null) {
 			lastSelected.setSelected(false);
 			lastSelected = null;
-		
+
 		}
 		selectMarkerIfHover(userMarker);
 		selectMarkerIfHover(airportList);
 		//loop();
 	}
-	
-	// if there is a marker selected 
+
+	// if there is a marker selected
 	private void selectMarkerIfHover(Marker marker)
 	{
 		// Abort if there's already a marker selected
@@ -154,7 +152,7 @@ public class AirportMap extends PApplet {
 			lastSelected = marker;
 			marker.setSelected(true);
 			return;
-			
+
 		}
 	}
 	//Overloading previous method
@@ -164,8 +162,8 @@ public class AirportMap extends PApplet {
 		if (lastSelected != null) {
 			return;
 		}
-		
-		for (Marker m : markers) 
+
+		for (Marker m : markers)
 		{
 			if (m.isInside(map,  mouseX, mouseY)) {
 				lastSelected = m;
@@ -179,8 +177,8 @@ public class AirportMap extends PApplet {
 	 * The event handler for mouse clicks
 	 */
 	@Override
-	public void mouseClicked() 
-	{ 
+	public void mouseClicked()
+	{
 		// If click on user's location marker
 		if (userMarker.isInside(map, mouseX, mouseY)) {
 			unhideAirports();
@@ -193,7 +191,7 @@ public class AirportMap extends PApplet {
 			}
 		}
 		// if click on other place
-		else 
+		else
 		{
 			// If no clicked markers
 			if (lastClicked == null) {
@@ -219,12 +217,12 @@ public class AirportMap extends PApplet {
 			} // If some marker clicked and click on empty space
 			if (lastClicked != null && emptySpaceClick) {
 				unhideAirports();
-				lastClicked = null;	
+				lastClicked = null;
 				emptySpaceClick = false;
 			}
 		}
 	}
-	
+
 	// Helper method that handles click on airport marker
 	private void airportClicked(Marker mk) {
 		lastClicked = (AirportMarker) mk;
@@ -251,13 +249,13 @@ public class AirportMap extends PApplet {
 			}
 		}
 	}
-	
+
 	//Show all airports and hide all routes
 	private void unhideAirports() {
 		for(Marker marker : airportList) {
 			marker.setHidden(false);
 		}
-			
+
 		for(Marker marker : routeList) {
 			marker.setHidden(true);
 		}
