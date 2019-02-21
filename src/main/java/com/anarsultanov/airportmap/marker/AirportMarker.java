@@ -23,13 +23,7 @@ SOFTWARE.
 package com.anarsultanov.airportmap.marker;
 
 import de.fhpotsdam.unfolding.data.Feature;
-import de.fhpotsdam.unfolding.data.PointFeature;
-import de.fhpotsdam.unfolding.geo.Location;
-import de.fhpotsdam.unfolding.marker.SimplePointMarker;
-import processing.core.PConstants;
 import processing.core.PGraphics;
-
-import java.util.Optional;
 
 /**
  * A class to represent AirportMarkers on a world map.
@@ -37,33 +31,25 @@ import java.util.Optional;
  * @author Anar Sultanov
  */
 
-public class AirportMarker extends SimplePointMarker {
-
-    public AirportMarker(Location location) {
-        super(location);
-    }
-
-    public AirportMarker(Location location, java.util.HashMap<java.lang.String, java.lang.Object> properties) {
-        super(location, properties);
-    }
+public class AirportMarker extends AbstractTitledPointMarker {
 
     private static final float MARKER_SIZE = 5;
 
     public AirportMarker(Feature city) {
-        super(((PointFeature) city).getLocation(), city.getProperties());
-
+        super(city);
     }
 
+    @Override
     public void draw(PGraphics pg, float x, float y) {
         if (!hidden) {
             drawMarker(pg, x, y);
             if (selected) {
-                showTitle(pg, x, y);
+                showTitle(getName(), pg, x, y, MARKER_SIZE);
             }
         }
     }
 
-    public void drawMarker(PGraphics pg, float x, float y) {
+    private void drawMarker(PGraphics pg, float x, float y) {
         pg.pushStyle();
         String code = getCode().orElse("-");
         pg.fill(40);
@@ -74,38 +60,7 @@ public class AirportMarker extends SimplePointMarker {
         pg.popStyle();
     }
 
-    public void showTitle(PGraphics pg, float x, float y) {
-
-        String name = getName() + " (" + getCode() + ") ";
-        String place = getCity() + ", " + getCountry() + " ";
-
-        pg.pushStyle();
-
-        pg.fill(255, 255, 255);
-        pg.textSize(12);
-        pg.rectMode(PConstants.CORNER);
-        pg.rect(x, y - MARKER_SIZE - 39, Math.max(pg.textWidth(name), pg.textWidth(place)) + 6, 39);
-        pg.fill(0, 0, 0);
-        pg.textAlign(PConstants.LEFT, PConstants.TOP);
-        pg.text(name, x + 3, y - MARKER_SIZE - 33);
-        pg.text(place, x + 3, y - MARKER_SIZE - 18);
-
-        pg.popStyle();
-    }
-
     private String getName() {
         return getStringProperty("name");
-    }
-
-    private String getCity() {
-        return getStringProperty("city");
-    }
-
-    private String getCountry() {
-        return getStringProperty("country");
-    }
-
-    private Optional<String> getCode() {
-        return Optional.ofNullable(getStringProperty("code"));
     }
 }

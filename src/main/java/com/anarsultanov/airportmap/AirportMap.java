@@ -35,6 +35,7 @@ import de.fhpotsdam.unfolding.providers.OpenStreetMap.OpenStreetMapProvider;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import processing.core.PApplet;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,26 +67,27 @@ public class AirportMap extends PApplet {
     }
 
     public void setup() {
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        int width = (int) (gd.getDisplayMode().getWidth() * 0.80);
+        int height = (int) (gd.getDisplayMode().getHeight() * 0.80);
         // setting up PApplet
-        size(1920, 1080, OPENGL);
+        size(width, height, OPENGL);
         //get user's location and create marker
-        PointFeature userLocation = DataParser.parseLocation();
+        PointFeature userLocation = DataParser.getLocationFeauture();
         userMarker = new UserMarker(userLocation);
         // setting up map and default events
-        map = new UnfoldingMap(this, 0, 0, 1920, 1080, new OpenStreetMapProvider());
+        map = new UnfoldingMap(this, 0, 0, width, height, new OpenStreetMapProvider());
         MapUtils.createDefaultEventDispatcher(this, map);
         //set zoom levels and pan to user's location
-        map.setZoomRange(6, 8);
+        map.setZoomRange(6, 10);
         map.zoomAndPanTo(6, userLocation.getLocation());
 
         // get features from airport data
-        //URLs for airports and routes databases
-        String airportsDataURL = "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat";
-        List<PointFeature> features = DataParser.parseAirports(this, airportsDataURL);
+        List<PointFeature> features = DataParser.getAirportFeatures();
 
         // list for markers, hashmap for quicker access when matching with routes
-        airportList = new ArrayList<Marker>();
-        HashMap<Integer, Location> airports = new HashMap<Integer, Location>();
+        airportList = new ArrayList<>();
+        HashMap<Integer, Location> airports = new HashMap<>();
 
         // create markers from features
         for (PointFeature feature : features) {
@@ -100,9 +102,8 @@ public class AirportMap extends PApplet {
 
 
         // parse route data
-        String routesDataURL = "https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat";
-        List<ShapeFeature> routes = DataParser.parseRoutes(this, routesDataURL);
-        routeList = new ArrayList<Marker>();
+        List<ShapeFeature> routes = DataParser.getRouteFeatures();
+        routeList = new ArrayList<>();
         for (ShapeFeature route : routes) {
 
             // get source and destination airportIds
@@ -159,8 +160,6 @@ public class AirportMap extends PApplet {
         if (marker.isInside(map, mouseX, mouseY)) {
             lastSelected = marker;
             marker.setSelected(true);
-            return;
-
         }
     }
 
@@ -208,7 +207,7 @@ public class AirportMap extends PApplet {
                     }
                 }
                 //If some marker clicked and new click on visible airport marker
-            } else if (lastClicked != null && !emptySpaceClick) {
+            } else if (!emptySpaceClick) {
                 for (Marker mk : airportList) {
                     if (mk.isInside(map, mouseX, mouseY) && !mk.isHidden()) {
                         unhideAirports();
@@ -230,7 +229,7 @@ public class AirportMap extends PApplet {
 
     // Helper method that handles click on airport marker
     private void airportClicked(Marker mk) {
-        lastClicked = (AirportMarker) mk;
+        lastClicked = mk;
         //Hide all airports except last clicked
         for (Marker airportMarker : airportList) {
             if (airportMarker != lastClicked) {

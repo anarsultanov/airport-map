@@ -39,14 +39,6 @@ public class RouteMarker extends SimpleLinesMarker {
 
     private static final int LINES = 5;
 
-    public RouteMarker(Location start, Location end) {
-        super(start, end);
-    }
-
-    public RouteMarker(List<Location> location) {
-        super(location);
-    }
-
     public RouteMarker(List<Location> location, java.util.HashMap<java.lang.String, java.lang.Object> properties) {
         super(location, properties);
     }
@@ -61,7 +53,7 @@ public class RouteMarker extends SimpleLinesMarker {
         }
     }
 
-    public void drawMarker(PGraphics pg, List<MapPosition> mapPositions) {
+    private void drawMarker(PGraphics pg, List<MapPosition> mapPositions) {
         pg.pushStyle();
         pg.strokeWeight(1);
         pg.stroke(0);
@@ -73,7 +65,7 @@ public class RouteMarker extends SimpleLinesMarker {
         pg.popStyle();
     }
 
-    public void showTitle(PGraphics pg, List<MapPosition> mapPositions) {
+    private void showTitle(PGraphics pg, List<MapPosition> mapPositions) {
         pg.pushStyle();
         pg.fill(200);
         MapPosition positionOne = mapPositions.get(0);
