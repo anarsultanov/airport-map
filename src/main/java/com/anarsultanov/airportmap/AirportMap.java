@@ -22,6 +22,10 @@ SOFTWARE.
 
 package com.anarsultanov.airportmap;
 
+import com.anarsultanov.airportmap.marker.AirportMarker;
+import com.anarsultanov.airportmap.marker.RouteMarker;
+import com.anarsultanov.airportmap.marker.UserMarker;
+import com.anarsultanov.airportmap.util.DataParser;
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.data.PointFeature;
 import de.fhpotsdam.unfolding.data.ShapeFeature;

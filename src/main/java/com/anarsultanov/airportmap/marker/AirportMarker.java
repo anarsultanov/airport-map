@@ -20,8 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package com.anarsultanov.airportmap;
-
+package com.anarsultanov.airportmap.marker;
 
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.PointFeature;
@@ -30,25 +29,27 @@ import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import processing.core.PConstants;
 import processing.core.PGraphics;
 
+import java.util.Optional;
+
 /**
- * A class to represent user's location on a world map.
+ * A class to represent AirportMarkers on a world map.
  *
  * @author Anar Sultanov
  */
 
-public class UserMarker extends SimplePointMarker {
+public class AirportMarker extends SimplePointMarker {
 
-    public UserMarker(Location location) {
+    public AirportMarker(Location location) {
         super(location);
     }
 
-    public UserMarker(Location location, java.util.HashMap<java.lang.String, java.lang.Object> properties) {
+    public AirportMarker(Location location, java.util.HashMap<java.lang.String, java.lang.Object> properties) {
         super(location, properties);
     }
 
-    private static final float MARKER_SIZE = 7;
+    private static final float MARKER_SIZE = 5;
 
-    public UserMarker(Feature city) {
+    public AirportMarker(Feature city) {
         super(((PointFeature) city).getLocation(), city.getProperties());
 
     }
@@ -64,16 +65,18 @@ public class UserMarker extends SimplePointMarker {
 
     public void drawMarker(PGraphics pg, float x, float y) {
         pg.pushStyle();
-        pg.fill(255, 0, 0);
+        String code = getCode().orElse("-");
+        pg.fill(40);
+        pg.textSize(8);
+        pg.text(code, x - (pg.textWidth(code) / 2), y - MARKER_SIZE);
+        pg.fill(150, 30, 30);
         pg.ellipse(x, y, MARKER_SIZE, MARKER_SIZE);
         pg.popStyle();
-
-
     }
 
     public void showTitle(PGraphics pg, float x, float y) {
 
-        String ip = "IP: " + getIp() + " (" + getCode() + ") ";
+        String name = getName() + " (" + getCode() + ") ";
         String place = getCity() + ", " + getCountry() + " ";
 
         pg.pushStyle();
@@ -81,21 +84,17 @@ public class UserMarker extends SimplePointMarker {
         pg.fill(255, 255, 255);
         pg.textSize(12);
         pg.rectMode(PConstants.CORNER);
-        pg.rect(x, y - MARKER_SIZE - 39, Math.max(pg.textWidth(ip), pg.textWidth(place)) + 6, 39);
+        pg.rect(x, y - MARKER_SIZE - 39, Math.max(pg.textWidth(name), pg.textWidth(place)) + 6, 39);
         pg.fill(0, 0, 0);
         pg.textAlign(PConstants.LEFT, PConstants.TOP);
-        pg.text(ip, x + 3, y - MARKER_SIZE - 33);
+        pg.text(name, x + 3, y - MARKER_SIZE - 33);
         pg.text(place, x + 3, y - MARKER_SIZE - 18);
 
         pg.popStyle();
     }
 
-    private String getIp() {
-        return getStringProperty("ip");
-    }
-
-    private String getCode() {
-        return getStringProperty("code");
+    private String getName() {
+        return getStringProperty("name");
     }
 
     private String getCity() {
@@ -106,4 +105,7 @@ public class UserMarker extends SimplePointMarker {
         return getStringProperty("country");
     }
 
+    private Optional<String> getCode() {
+        return Optional.ofNullable(getStringProperty("code"));
+    }
 }
